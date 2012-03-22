@@ -131,11 +131,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BackgroundImageController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Models\ImageModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +146,9 @@
     <Content Include="Content\images\icons-18-white.png" />
     <Content Include="Content\images\icons-36-black.png" />
     <Content Include="Content\images\icons-36-white.png" />
+    <EmbeddedResource Include="Content\images\pitch1.png" />
+    <EmbeddedResource Include="Content\images\pitch2.jpg" />
+    <EmbeddedResource Include="Content\images\pitch3.jpg" />
     <Content Include="Content\jquery.mobile-1.0.1.css" />
     <Content Include="Content\jquery.mobile-1.0.1.min.css" />
     <Content Include="Content\jquery.mobile.structure-1.0.1.css" />
@@ -193,6 +198,7 @@
     <Content Include="Scripts\lib\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\lib\knockout-2.0.0.debug.js" />
     <Content Include="Scripts\lib\knockout-2.0.0.js" />
+    <Content Include="Scripts\lib\knockout.mapping-latest.js" />
     <Content Include="Scripts\lib\modernizr-2.0.6-development-only.js" />
     <Content Include="Scripts\src\SketchPad.js" />
     <Content Include="Web.config" />
@@ -226,6 +232,7 @@
     <None Include="Content\images\Thumbs.db" />
     <Content Include="Views\Home\Draw.cshtml" />
     <Content Include="Scripts\src\SketchPad.ViewModel.Draw.js" />
+    <Content Include="Scripts\src\SketchPad.Data.js" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

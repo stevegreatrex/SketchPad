@@ -43,11 +43,26 @@
     text-shadow: none;
 }
 
-canvas.full-screen
+div#drawing-canvas-container
 {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 100px;
+    right: 0px;
+}
+canvas#drawing-canvas
+{
+    width: 100%;
     height: 100%;
-    width:  100%;
-    background: red;
+}
+
+div#background-selector
+{
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    height: 100px;
 }
 
 div.ui-content
