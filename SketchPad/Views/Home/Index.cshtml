@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "SketchPad";
 }
 
-@Html.ActionLink("Start Sketching", "Draw", null, new Dictionary<string, object> { { "data-role", "button" } } )
+@Html.ActionLink("Start Sketching", "Draw", null, new Dictionary<string, object> { { "data-role", "button" }, { "rel", "external" } } )

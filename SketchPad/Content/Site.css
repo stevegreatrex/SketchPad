@@ -42,3 +42,22 @@
 .ui-btn-active  {
     text-shadow: none;
 }
+
+canvas.full-screen
+{
+    height: 100%;
+    width:  100%;
+    background: red;
+}
+
+div.ui-content
+{
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top:  43px;
+    bottom: 0px;
+    overflow-x:  hidden;
+    overflow-y:  hidden;
+    padding: 0px;
+}

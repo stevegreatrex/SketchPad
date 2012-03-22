@@ -177,23 +177,24 @@
     <Content Include="Content\themes\base\jquery.ui.theme.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="Scripts\jquery-1.7.1-vsdoc.js" />
-    <Content Include="Scripts\jquery-1.7.1.js" />
-    <Content Include="Scripts\jquery-1.7.1.min.js" />
-    <Content Include="Scripts\jquery-ui-1.8.11.js" />
-    <Content Include="Scripts\jquery-ui-1.8.11.min.js" />
-    <Content Include="Scripts\jquery.mobile-1.0.1.js" />
-    <Content Include="Scripts\jquery.mobile-1.0.1.min.js" />
-    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
-    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
-    <Content Include="Scripts\jquery.validate-vsdoc.js" />
-    <Content Include="Scripts\jquery.validate.js" />
-    <Content Include="Scripts\jquery.validate.min.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Scripts\knockout-2.0.0.debug.js" />
-    <Content Include="Scripts\knockout-2.0.0.js" />
-    <Content Include="Scripts\modernizr-2.0.6-development-only.js" />
+    <Content Include="Scripts\lib\jquery-1.7.1-vsdoc.js" />
+    <Content Include="Scripts\lib\jquery-1.7.1.js" />
+    <Content Include="Scripts\lib\jquery-1.7.1.min.js" />
+    <Content Include="Scripts\lib\jquery-ui-1.8.11.js" />
+    <Content Include="Scripts\lib\jquery-ui-1.8.11.min.js" />
+    <Content Include="Scripts\lib\jquery.mobile-1.0.1.js" />
+    <Content Include="Scripts\lib\jquery.mobile-1.0.1.min.js" />
+    <Content Include="Scripts\lib\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\lib\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="Scripts\lib\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\lib\jquery.validate.js" />
+    <Content Include="Scripts\lib\jquery.validate.min.js" />
+    <Content Include="Scripts\lib\jquery.validate.unobtrusive.js" />
+    <Content Include="Scripts\lib\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\lib\knockout-2.0.0.debug.js" />
+    <Content Include="Scripts\lib\knockout-2.0.0.js" />
+    <Content Include="Scripts\lib\modernizr-2.0.6-development-only.js" />
+    <Content Include="Scripts\src\SketchPad.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -224,6 +225,7 @@
   <ItemGroup>
     <None Include="Content\images\Thumbs.db" />
     <Content Include="Views\Home\Draw.cshtml" />
+    <Content Include="Scripts\src\SketchPad.ViewModel.Draw.js" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

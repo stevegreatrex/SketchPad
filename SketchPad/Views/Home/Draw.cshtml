@@ -1,5 +1,11 @@
 ﻿@{
-    ViewBag.Title = "Draw";
+    ViewBag.Title = "Sketch Pad";
 }
 
-<h2>Draw</h2>
+<canvas id="drawingCanvas"></canvas>
+
+<script>
+    $(function() {
+        ko.applyBindings(new SketchPad.ViewModel.Draw($("#drawingCanvas")));
+    });
+</script>

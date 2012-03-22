@@ -49,6 +49,18 @@ namespace SketchPad
 			RegisterGlobalFilters(GlobalFilters.Filters);
 			RegisterRoutes(RouteTable.Routes);
 
+			var libBundle = new Bundle("~/Scripts/lib/js", new JsMinify());
+			libBundle.AddDirectory("~/Scripts/lib", "*.js", true);
+			BundleTable.Bundles.Add(libBundle);
+
+#if DEBUG
+			var srcBundle = new Bundle("~/Scripts/src/js", new NoTransform("text/javascript"));
+#else
+			var srcBundle = new Bundle("~/Scripts/src/js", new JsMinify());
+#endif
+			srcBundle.AddDirectory("~/Scripts/src", "*.js", true);
+			BundleTable.Bundles.Add(srcBundle);
+
 			BundleTable.Bundles.RegisterTemplateBundles();
 		}
 	}
