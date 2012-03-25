@@ -76,3 +76,19 @@ div.ui-content
     overflow-y:  hidden;
     padding: 0px;
 }
+
+li.background-image-picker
+{
+    list-style-type: none;
+    float:  left;
+    margin-left:  10px;
+}
+li.background-image-picke:hover
+{
+    border-width:  2px;
+    border-color: #ffd800;
+}
+li.background-image-picker img
+{
+    height:  70px;
+}

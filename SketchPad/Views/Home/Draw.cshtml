@@ -8,14 +8,14 @@
 
 <div id="background-selector">
     <ul data-bind="foreach: availableBackgrounds">
-        <li>
-            <span data-bind="text: Name"></span>
+        <li class="background-image-picker">
+            <img data-bind="imageData: Data, click: $parent.applyBackgroundImage" /
         </li>
     </ul>
 </div>
 
 <script>
     $(function () {
-        ko.applyBindings(new SketchPad.ViewModel.Draw(new SketchPad.Data.ImageSource()));
+        ko.applyBindings(new SketchPad.ViewModel.Draw(new SketchPad.Data.ImageSource(), "drawing-canvas"));
     });
 </script>

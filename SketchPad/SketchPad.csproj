@@ -233,6 +233,7 @@
     <Content Include="Views\Home\Draw.cshtml" />
     <Content Include="Scripts\src\SketchPad.ViewModel.Draw.js" />
     <Content Include="Scripts\src\SketchPad.Data.js" />
+    <Content Include="Scripts\src\SketchPad.knockout.js" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

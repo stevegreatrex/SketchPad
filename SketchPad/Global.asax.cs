@@ -58,6 +58,7 @@ namespace SketchPad
 #else
 			var srcBundle = new Bundle("~/Scripts/src/js", new JsMinify());
 #endif
+			srcBundle.AddFile("~/Scripts/src/SketchPad.knockout.js");
 			srcBundle.AddFile("~/Scripts/src/SketchPad.js");
 			srcBundle.AddDirectory("~/Scripts/src", "*.js", true);
 			BundleTable.Bundles.Add(srcBundle);
