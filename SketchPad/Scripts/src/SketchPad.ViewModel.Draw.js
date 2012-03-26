@@ -217,6 +217,7 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
                     _spritePickerLayer.draw();
                 }
             });
+            xOffset += 50;
         });
         
         _spritePickerLayer.add(background);
@@ -232,7 +233,7 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
             var kineticImage = new Kinetic.Image({
                 image: image,
                 x: data.xOffset,
-                y: data.baseYOffset - image.height / 2,
+                y: data.baseYOffset - 30,
                 alpha: 0.7,
                 draggable: true
             });

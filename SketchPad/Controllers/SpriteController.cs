@@ -20,6 +20,12 @@ namespace SketchPad.Controllers
 				Name = "Player",
 				Data = GetImageData("player.gif")
 			});
+			_sprites.Add(new ImageModel
+			{
+				Id = Guid.NewGuid(),
+				Name = "Player 2",
+				Data = GetImageData("player2.gif")
+			});
 		}
 
 		static string GetImageData(string name)

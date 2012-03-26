@@ -151,6 +151,7 @@
     <EmbeddedResource Include="Content\images\pitch2.jpg" />
     <EmbeddedResource Include="Content\images\pitch3.jpg" />
     <EmbeddedResource Include="Content\images\player.gif" />
+    <EmbeddedResource Include="Content\images\player2.gif" />
     <Content Include="Content\jquery.mobile-1.0.1.css" />
     <Content Include="Content\jquery.mobile-1.0.1.min.css" />
     <Content Include="Content\jquery.mobile.structure-1.0.1.css" />
