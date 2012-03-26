@@ -2,9 +2,7 @@
     ViewBag.Title = "Sketch Pad";
 }
 
-<div id="drawing-canvas-container">
-    <canvas id="drawing-canvas"></canvas>
-</div>
+<div id="drawing-canvas-container"></div>
 
 <div id="background-selector">
     <ul data-bind="foreach: availableBackgrounds">
@@ -16,6 +14,6 @@
 
 <script>
     $(function () {
-        ko.applyBindings(new SketchPad.ViewModel.Draw(new SketchPad.Data.ImageSource(), "drawing-canvas"));
+        ko.applyBindings(new SketchPad.ViewModel.Draw(new SketchPad.Data.ImageSource(), "drawing-canvas-container"));
     });
 </script>

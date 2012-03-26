@@ -1,16 +1,16 @@
 ﻿SketchPad.ViewModel = SketchPad.ViewModel || {};
 
-SketchPad.ViewModel.Draw = function (imageSource, canvas) {
-	var _backgroundImage = ko.observable(),
+SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
+    var _backgroundImage = ko.observable(),
 		_backgroundImages = ko.observableArray(),
 		_isLoadingImages = ko.observable(false),
-		_canvas = $("#" + canvas),
-		_drawingContext = document.getElementById(canvas).getContext("2d");
-
-	var _initCanvas = function () {
-		_canvas.attr("width",_canvas.width());
-		_canvas.attr("height", _canvas.height());
-	};
+        _stageContainer = $("#" + stageContainer),
+		_stage = new Kinetic.Stage({
+		    container: stageContainer,
+		    width: _stageContainer.width(),
+		    height: _stageContainer.height()
+        }),
+        _backgroundLayer = null;
 
 	var _refreshImages = function () {
 		_isLoadingImages(true);
@@ -24,18 +24,31 @@ SketchPad.ViewModel.Draw = function (imageSource, canvas) {
 	};
 
 	var _applyBackgroundImage = function () {
-		var image = new Image();
+	    if (_backgroundLayer) {
+	        _stage.remove(_backgroundLayer);
+        }
+
+	    _backgroundLayer = new Kinetic.Layer();
+	    var image = new Image();
+	    image.onload = function () {
+	        var xRatio = image.width / _stage.width;
+	        var yRatio = image.height / _stage.height;
+	        var ratio = xRatio < yRatio ? yRatio : xRatio;
+
+	        var kineticImage = new Kinetic.Image({
+	            x: 0,
+	            y: 0,
+	            image: image,
+	            width: image.width / ratio,
+                height: image.height / ratio
+            });
+	        _backgroundLayer.add(kineticImage);
+	        _stage.add(_backgroundLayer);
+	    };
+
 		image.src = this.Data();
-		var imageWidth = image.width;
-		var imageHeight = image.height;
-		var xRatio = imageWidth / _canvas.width();
-		var yRatio = imageHeight / _canvas.height();
-		var ratio = xRatio < yRatio ? yRatio : xRatio;
-		
-		_drawingContext.drawImage(image, 0, 0, imageWidth / ratio, imageHeight / ratio);
 	};
 
-	_initCanvas();
 	_refreshImages();
 
 	return {

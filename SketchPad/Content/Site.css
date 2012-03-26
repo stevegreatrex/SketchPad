@@ -51,6 +51,12 @@ div#drawing-canvas-container
     bottom: 100px;
     right: 0px;
 }
+
+canvas {
+    border: 1px solid #9C9898;
+    
+}
+
 canvas#drawing-canvas
 {
     width: 100%;
