@@ -9,7 +9,17 @@ SketchPad.Data.ImageSource = function () {
 
 		return token;
 	};
+
+	var _getSprites = function () {
+	    var token = $.Deferred();
+	    $.getJSON("/api/sprite", null, function (data) {
+	        token.resolve(data);
+	    });
+
+	    return token;
+	};
 	return {
-		getBackgroundImages: _getBackgroundImages
+	    getBackgroundImages: _getBackgroundImages,
+        getSprites: _getSprites
 	};
 };

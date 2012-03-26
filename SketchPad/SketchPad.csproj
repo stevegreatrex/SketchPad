@@ -133,6 +133,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\BackgroundImageController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\SpriteController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -149,6 +150,7 @@
     <EmbeddedResource Include="Content\images\pitch1.png" />
     <EmbeddedResource Include="Content\images\pitch2.jpg" />
     <EmbeddedResource Include="Content\images\pitch3.jpg" />
+    <EmbeddedResource Include="Content\images\player.gif" />
     <Content Include="Content\jquery.mobile-1.0.1.css" />
     <Content Include="Content\jquery.mobile-1.0.1.min.css" />
     <Content Include="Content\jquery.mobile.structure-1.0.1.css" />

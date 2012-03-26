@@ -1,8 +1,8 @@
 ﻿SketchPad.ViewModel = SketchPad.ViewModel || {};
 
 SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
-    var _backgroundImage = ko.observable(),
-		_backgroundImages = ko.observableArray(),
+    var _backgroundImages = ko.observableArray(),
+        _sprites = ko.observableArray(),
 		_isLoadingImages = ko.observable(false),
         _stageContainer = $("#" + stageContainer),
 		_stage = new Kinetic.Stage({
@@ -14,13 +14,24 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
 
 	var _refreshImages = function () {
 		_isLoadingImages(true);
-		imageSource.getBackgroundImages().done(function (data) {
-			_backgroundImages.removeAll();
+		var backgroundImages = imageSource.getBackgroundImages().done(function (data) {
+		    _backgroundImages.removeAll();
 			for (var i = 0; i < data.length; i++) {
 				_backgroundImages.push(ko.mapping.fromJS(data[i]));
 			}
-			_isLoadingImages(false);
-		});
+        });
+
+		var sprites = imageSource.getSprites().done(function (data) {
+		    _sprites.removeAll();
+		    for (var i = 0; i < data.length; i++) {
+		        _sprites.push(ko.mapping.fromJS(data[i]));
+		    }
+        });
+
+		$.when(sprites, backgroundImages)
+        .then(function () {
+            _isLoadingImages(false);
+        });
 	};
 
 	var _applyBackgroundImage = function () {
@@ -52,8 +63,8 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
 	_refreshImages();
 
 	return {
-		background: _backgroundImage,
 		availableBackgrounds: _backgroundImages,
+        availableSprites: _sprites,
 		isLoadingImages: _isLoadingImages,
 		applyBackgroundImage: _applyBackgroundImage
 	};
