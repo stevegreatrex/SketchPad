@@ -18,18 +18,37 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
         }
 
         _spritePickerLayer = new Kinetic.Layer();
+        var pickerHeight = 100;
         var background = new Kinetic.Rect({
-            width: 100,
+            height: pickerHeight,
             alpha: 0.3,
-            height: _stage.height,
+            width: _stage.width,
             fill: "white",
-            x: _stage.width - 100
+            y: _stage.height - pickerHeight
         });
-        _setAlphaOnHover(background, _spritePickerLayer, 0.7, 0.3);
+
+        var baseYOffset = _stage.height - (pickerHeight * 0.5);
+        var xOffset = 10;
+        $.each(spriteImages, function (i, spriteImage) {
+            var image = new Image();
+            image.onload = function () {
+                var kineticImage = new Kinetic.Image({
+                    image: image,
+                    x: xOffset,
+                    y: baseYOffset - image.height / 2,
+                    alpha: 0.7
+                });
+                _setAlphaOnHover(kineticImage, _spritePickerLayer, 1, 0.7);
+                _spritePickerLayer.add(kineticImage);
+                _spritePickerLayer.draw();
+            };
+            image.src = spriteImage.Data;
+        });
         
         _spritePickerLayer.add(background);
         _stage.add(_spritePickerLayer);
         _spritePickerLayer.setZIndex(100);
+        _stage.add(_spritePickerLayer);
     };
 
     var _setAlphaOnHover = function(target, layer, hoverAlpha, nonHoverAlpha) {
@@ -53,7 +72,7 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
         });
 
 		var sprites = imageSource.getSprites().done(function (data) {
-		    _stage.add(_createSpritePickerLayer(data));
+		    _createSpritePickerLayer(data);
         });
 
 		$.when(sprites, backgroundImages)
