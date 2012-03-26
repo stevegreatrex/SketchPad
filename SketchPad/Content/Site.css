@@ -53,8 +53,7 @@ div#drawing-canvas-container
 }
 
 canvas {
-    border: 1px solid #9C9898;
-    
+    cursor:  pointer;
 }
 
 canvas#drawing-canvas

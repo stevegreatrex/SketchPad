@@ -4,23 +4,83 @@ SketchPad.ViewModel.Levels = {
     background: 0,
     toolbar: 100,
     toolbarIcons: 105,
-    toolbarButtons: 110,
-    sprite: 200
+    toolbarButtons: 150,
+    line: 120,
+    sprite: 200,
+    clickCatcher: 300
 };
 
 SketchPad.ViewModel.LineTool = function (data) {
-    var _layer = null,
+    var _tempLine = null,
+        _layer = new Kinetic.Layer(),
         _color = data.color || "black",
         _strokeWidth = data.strokeWidth || 5,
+        _startPoint = null,
+        _attached = false,
+        _clickLayer = new Kinetic.Layer({
+            x: data.drawArea.x,
+            y: data.drawArea.y,
+            width: data.drawArea.width,
+            height: data.drawArea.height
+        }),
+        _clickCatcher = new Kinetic.Rect({
+            x: 0,
+            y: 0,
+            width: data.drawArea.width,
+            height: data.drawArea.height
+        }),
+        _getMousePoint = function (e) {
+            return {
+                x: e.offsetX,
+                y: e.offsetY
+            };
+        },
         _attach = function () {
+            if (_attached) return;
+            _clickCatcher.on("mousedown." + data.name, function (e) {
+                _startPoint = _getMousePoint(e);
+            });
+            _clickCatcher.on("mousemove." + data.name, function (e) {
+                if (_startPoint) {
+                    _drawTempLine(_startPoint, _getMousePoint(e));
+                }
+            });
+            _clickCatcher.on("mouseup." + data.name, function (e) {
+                if (_startPoint) {
+                    _drawPermLine(_startPoint, _getMousePoint(e));
+                    _startPoint = null;
+                }
+            });
+            data.stage.add(_clickLayer);
+            _clickLayer.setZIndex(SketchPad.ViewModel.Levels.clickCatcher);
+            _clickLayer.draw();
         },
         _detach = function () {
+            if (!_attached) return;
+
+            _clickCatcher.off("mousedown." + data.name);
+            _clickCatcher.off("mousemove." + data.name);
+            _clickCatcher.off("mouseup." + data.name);
+            data.stage.remove(_clickLayer);
         },
-        _drawLine = function (from, to) {
-            if (_layer) {
-                data.stage.remove(_layer);
+        _drawTempLine = function (from, to) {
+            if (_tempLine) {
+                _layer.remove(_tempLine.line);
+                _layer.remove(_tempLine.lineEnd);
             }
-            _layer = new Kinetic.Layer();
+            
+            _tempLine = _createLine(from, to);
+            _layer.add(_tempLine.line);
+            _layer.add(_tempLine.lineEnd);
+            _layer.draw();
+        },
+        _drawPermLine = function (from, to) {
+            var line = _createLine(from, to);
+            _layer.add(line.line);
+            _layer.add(line.lineEnd);
+            _layer.draw();
+        },
+        _createLine = function (from, to) {
             var line = new Kinetic.Polygon({
                 points: [from, to],
                 stroke: _color,
@@ -32,15 +92,20 @@ SketchPad.ViewModel.LineTool = function (data) {
                 radius: _strokeWidth,
                 fill: _color
             });
-            _layer.add(line);
-            _layer.add(lineEnd);
-            data.stage.add(_layer);
-            _layer.setZIndex(SketchPad.ViewModel.Levels.toolbarIcons);
+            return {
+                line: line,
+                lineEnd: lineEnd
+            };
         },
         _drawIcon = function (data) {
             var mid = data.y + data.height /2;
-            _drawLine({ x: data.x, y: mid }, { x: data.width, y: mid });
+            _drawPermLine({ x: data.x, y: mid }, { x: data.width, y: mid });
         };
+
+    _clickLayer.add(_clickCatcher);
+    data.stage.add(_layer);
+    _layer.setZIndex(SketchPad.ViewModel.Levels.line);
+    _layer.draw();
 
     return {
         attach: _attach,
@@ -174,21 +239,33 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
             fill: "white"
         });
 
+        var drawArea = {
+            x: _toolbarWidth,
+            y: 0,
+            width: _stage.width - _toolbarWidth,
+            height: _stage.height - _pickerHeight
+        };
         var tools = [
             new SketchPad.ViewModel.LineTool({
                 stage: _stage,
                 color: "red",
-                strokeWidth: 5
-            }),
-            new SketchPad.ViewModel.LineTool({
-                stage: _stage,
-                color: "green",
-                strokeWidth: 5
+                strokeWidth: 5,
+                name: "redline",
+                drawArea: drawArea
             }),
             new SketchPad.ViewModel.LineTool({
                 stage: _stage,
                 color: "orange",
-                strokeWidth: 5
+                strokeWidth: 5,
+                name: "orangeline",
+                drawArea: drawArea
+            }),
+            new SketchPad.ViewModel.LineTool({
+                stage: _stage,
+                color: "black",
+                strokeWidth: 5,
+                name: "blackline",
+                drawArea: drawArea
             })
         ];
 
