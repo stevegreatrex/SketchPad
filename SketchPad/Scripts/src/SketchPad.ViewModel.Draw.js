@@ -2,7 +2,6 @@
 
 SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
     var _backgroundImages = ko.observableArray(),
-        _sprites = ko.observableArray(),
 		_isLoadingImages = ko.observable(false),
         _stageContainer = $("#" + stageContainer),
 		_stage = new Kinetic.Stage({
@@ -10,7 +9,39 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
 		    width: _stageContainer.width(),
 		    height: _stageContainer.height()
         }),
-        _backgroundLayer = null;
+        _backgroundLayer = null,
+        _spritePickerLayer = null;
+
+    var _createSpritePickerLayer = function (spriteImages) {
+        if (_spritePickerLayer) {
+            _stage.remove(_spritePickerLayer);
+        }
+
+        _spritePickerLayer = new Kinetic.Layer();
+        var background = new Kinetic.Rect({
+            width: 100,
+            alpha: 0.3,
+            height: _stage.height,
+            fill: "white",
+            x: _stage.width - 100
+        });
+        _setAlphaOnHover(background, _spritePickerLayer, 0.7, 0.3);
+        
+        _spritePickerLayer.add(background);
+        _stage.add(_spritePickerLayer);
+        _spritePickerLayer.setZIndex(100);
+    };
+
+    var _setAlphaOnHover = function(target, layer, hoverAlpha, nonHoverAlpha) {
+        target.on("mouseover", function () {
+            target.setAlpha(hoverAlpha);
+            layer.draw();
+        });
+        target.on("mouseout", function () {
+            target.setAlpha(nonHoverAlpha);
+            layer.draw();
+        });
+    };
 
 	var _refreshImages = function () {
 		_isLoadingImages(true);
@@ -22,10 +53,7 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
         });
 
 		var sprites = imageSource.getSprites().done(function (data) {
-		    _sprites.removeAll();
-		    for (var i = 0; i < data.length; i++) {
-		        _sprites.push(ko.mapping.fromJS(data[i]));
-		    }
+		    _stage.add(_createSpritePickerLayer(data));
         });
 
 		$.when(sprites, backgroundImages)
@@ -55,6 +83,7 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
             });
 	        _backgroundLayer.add(kineticImage);
 	        _stage.add(_backgroundLayer);
+	        _backgroundLayer.setZIndex(0);
 	    };
 
 		image.src = this.Data();
@@ -64,7 +93,6 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
 
 	return {
 		availableBackgrounds: _backgroundImages,
-        availableSprites: _sprites,
 		isLoadingImages: _isLoadingImages,
 		applyBackgroundImage: _applyBackgroundImage
 	};
