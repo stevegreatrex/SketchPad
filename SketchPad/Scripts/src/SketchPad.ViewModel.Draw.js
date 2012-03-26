@@ -13,6 +13,7 @@ SketchPad.ViewModel.Levels = {
 SketchPad.ViewModel.LineTool = function (data) {
     var _tempLine = null,
         _layer = new Kinetic.Layer(),
+        _lineStyle = data.lineStyle || "straight",
         _color = data.color || "black",
         _strokeWidth = data.strokeWidth || 5,
         _startPoint = null,
@@ -81,11 +82,13 @@ SketchPad.ViewModel.LineTool = function (data) {
             _layer.draw();
         },
         _createLine = function (from, to) {
-            var line = new Kinetic.Polygon({
-                points: [from, to],
-                stroke: _color,
-                strokeWidth: _strokeWidth
-            });
+            var line = null;
+            if (_lineStyle === "straight") {
+                line = _createStraightLine(from, to);
+            } else if (_lineStyle === "curved") {
+                line = _createCurvedLine(from, to);
+            }
+            
             var lineEnd = new Kinetic.Circle({
                 x: to.x,
                 y: to.y,
@@ -96,6 +99,35 @@ SketchPad.ViewModel.LineTool = function (data) {
                 line: line,
                 lineEnd: lineEnd
             };
+        },
+        _createStraightLine = function (from, to) {
+            return new Kinetic.Polygon({
+                points: [from, to],
+                stroke: _color,
+                strokeWidth: _strokeWidth
+            });
+        },
+        _createCurvedLine = function (from, to) {
+            var xDiff = to.x - from.x;
+            var yDiff = to.y - from.y;
+            var referencePoint = xDiff < yDiff ? 
+                { x: to.x + (_strokeWidth * 2), y: to.y * 0.7 } :
+                { x: to.x * 0.7, y: to.y + (_strokeWidth * 2) };
+
+            return new Kinetic.Shape({
+                drawFunc: function () {
+                    var context = this.getContext();
+                    context.beginPath();
+                    context.linewidth = _strokeWidth;
+                    context.moveTo(from.x, from.y);
+                    context.quadraticCurveTo(referencePoint.x,
+                                    referencePoint.y,
+                                    to.x, to.y);
+                    context.stroke();
+                },
+                stroke: _color,
+                strokeWidth: _strokeWidth
+            });
         },
         _drawIcon = function (data) {
             var mid = data.y + data.height /2;
@@ -124,7 +156,7 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
 		    height: _stageContainer.height()
         }),
         _pickerHeight = 100,
-        _toolbarWidth = 50,
+        _toolbarWidth = 100,
         _backgroundLayer = null,
         _spritePickerLayer = null,
         _toolbarLayer = null;
@@ -266,12 +298,20 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
                 strokeWidth: 5,
                 name: "blackline",
                 drawArea: drawArea
+            }),
+            new SketchPad.ViewModel.LineTool({
+                stage: _stage,
+                color: "black",
+                strokeWidth: 5,
+                name: "blackcurvedline",
+                lineStyle: "curved",
+                drawArea: drawArea
             })
         ];
 
         var yOffset = 10,
-            iconHeight = 20,
-            iconWidth = 40,
+            iconHeight = 30,
+            iconWidth = _toolbarWidth-10,
             _toolbarButtons = new Kinetic.Layer();
         $.each(tools, function (i, tool) {
             var background = new Kinetic.Rect({
@@ -289,7 +329,7 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
                 width: iconWidth -5,
                 height: iconHeight
             });
-            yOffset += 30;
+            yOffset += iconHeight + 10;
 
             _toolbarButtons.add(background);
 
