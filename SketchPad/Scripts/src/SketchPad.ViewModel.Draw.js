@@ -12,6 +12,13 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
         _backgroundLayer = null,
         _spritePickerLayer = null;
 
+    var _isWithin = function (target, shape) {
+        var position = shape.getPosition();
+        var myPosition = target.getPosition();
+        return (position.x > myPosition.x && position.x < myPosition.x + target.width &&
+        position.y > myPosition.y && position.y < myPosition.y + target.height)
+    };
+
     var _createSpritePickerLayer = function (spriteImages) {
         if (_spritePickerLayer) {
             _stage.remove(_spritePickerLayer);
@@ -19,6 +26,7 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
 
         _spritePickerLayer = new Kinetic.Layer();
         var pickerHeight = 100;
+        var baseYOffset = _stage.height - (pickerHeight * 0.5);
         var background = new Kinetic.Rect({
             height: pickerHeight,
             alpha: 0.3,
@@ -27,14 +35,24 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
             y: _stage.height - pickerHeight
         });
 
-        var baseYOffset = _stage.height - (pickerHeight * 0.5);
-        var xOffset = 10;
+        var trash = new Kinetic.Rect({
+            height: 80,
+            width: 80,
+            stroke: "red",
+            strokeThickness: 5,
+            x: 10,
+            y: baseYOffset - 40
+        });
+
+        var xOffset = 100;
         $.each(spriteImages, function (i, spriteImage) {
             _createSpriteImage({
                 image: spriteImage,
                 xOffset: xOffset,
                 baseYOffset: baseYOffset,
                 layer: _spritePickerLayer,
+                trash: trash,
+                pickerArea: background,
                 onCreated: function (image) {
                     _spritePickerLayer.add(image);
                     _spritePickerLayer.draw();
@@ -43,6 +61,7 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
         });
         
         _spritePickerLayer.add(background);
+        _spritePickerLayer.add(trash);
         _stage.add(_spritePickerLayer);
         _spritePickerLayer.setZIndex(100);
         _stage.add(_spritePickerLayer);
@@ -59,12 +78,21 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
                 draggable: true
             });
             _setAlphaOnHover(kineticImage, _spritePickerLayer, 1, 0.7);
-            kineticImage.on("dragend", function () {
+            //remove the hover styles once it is dragged
+            kineticImage.on("dragend.disableAlpha", function () {
                 kineticImage.off("mouseover.hoverAlpha");
                 kineticImage.off("mouseout.hoverAlpha");
             });
-            kineticImage.on("dragstart", function () {
-                onCreated(_createSpriteImage(data));
+            //clone the image when it is created so we can drag it again
+            kineticImage.on("dragstart.clone", function () {
+                data.onCreated(_createSpriteImage(data));
+            });
+            //remove the item if it is dropped onto the trash or doesn't make it out of the background area
+            kineticImage.on("dragend.trash", function (e) {
+                if (_isWithin(data.trash, kineticImage) || _isWithin(data.pickerArea, kineticImage)) {
+                    data.layer.remove(kineticImage);
+                    data.layer.draw();
+                }
             });
             data.onCreated(kineticImage);
         };
