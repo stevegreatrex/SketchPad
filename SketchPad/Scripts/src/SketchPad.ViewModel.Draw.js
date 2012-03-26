@@ -38,6 +38,7 @@ SketchPad.ViewModel.LineTool = function (data) {
         },
         _attach = function () {
             if (_attached) return;
+            _attached = true;
             _clickCatcher.on("mousedown." + data.name, function (e) {
                 _startPoint = _getMousePoint(e);
             });
@@ -49,6 +50,7 @@ SketchPad.ViewModel.LineTool = function (data) {
             _clickCatcher.on("mouseup." + data.name, function (e) {
                 if (_startPoint) {
                     _drawPermLine(_startPoint, _getMousePoint(e));
+                    _clearTempLine();
                     _startPoint = null;
                 }
             });
@@ -58,27 +60,28 @@ SketchPad.ViewModel.LineTool = function (data) {
         },
         _detach = function () {
             if (!_attached) return;
-
+            _attached = false;
             _clickCatcher.off("mousedown." + data.name);
             _clickCatcher.off("mousemove." + data.name);
             _clickCatcher.off("mouseup." + data.name);
             data.stage.remove(_clickLayer);
         },
         _drawTempLine = function (from, to) {
-            if (_tempLine) {
-                _layer.remove(_tempLine.line);
-                _layer.remove(_tempLine.lineEnd);
-            }
+            _clearTempLine();
             
             _tempLine = _createLine(from, to);
-            _layer.add(_tempLine.line);
-            _layer.add(_tempLine.lineEnd);
+            _layer.add(_tempLine.group);
             _layer.draw();
+        },
+        _clearTempLine = function () {
+            if (_tempLine) {
+                _layer.remove(_tempLine.group);
+                _tempLine = null;
+            }
         },
         _drawPermLine = function (from, to) {
             var line = _createLine(from, to);
-            _layer.add(line.line);
-            _layer.add(line.lineEnd);
+            _layer.add(line.group);
             _layer.draw();
         },
         _createLine = function (from, to) {
@@ -95,9 +98,16 @@ SketchPad.ViewModel.LineTool = function (data) {
                 radius: _strokeWidth,
                 fill: _color
             });
+
+            var group = new Kinetic.Group({
+                draggable: true
+            });
+            group.add(line);
+            group.add(lineEnd);
             return {
                 line: line,
-                lineEnd: lineEnd
+                lineEnd: lineEnd,
+                group: group
             };
         },
         _createStraightLine = function (from, to) {
@@ -310,10 +320,25 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
             })
         ];
 
-        var yOffset = 10,
+        var yOffset = 50,
             iconHeight = 30,
             iconWidth = _toolbarWidth-10,
             _toolbarButtons = new Kinetic.Layer();
+        var clearTool = new Kinetic.Rect({
+            x: 5,
+            y: 10,
+            height: iconHeight,
+            width: iconWidth,
+            stroke: "black",
+            strokeThickness: 1
+        });
+        clearTool.on("click", function () {
+            $.each(tools, function (j, tool) {
+                tool.detach();
+            });
+        });
+        _toolbarButtons.add(clearTool);
+
         $.each(tools, function (i, tool) {
             var background = new Kinetic.Rect({
                 x: 5,
