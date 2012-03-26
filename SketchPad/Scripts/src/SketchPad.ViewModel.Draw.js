@@ -1,5 +1,13 @@
 ﻿SketchPad.ViewModel = SketchPad.ViewModel || {};
 
+SketchPad.ViewModel.Levels = {
+    background: 0,
+    toolbar: 100,
+    toolbarIcons: 105,
+    toolbarButtons: 110,
+    sprite: 200
+};
+
 SketchPad.ViewModel.LineTool = function (data) {
     var _layer = null,
         _color = data.color || "black",
@@ -27,6 +35,7 @@ SketchPad.ViewModel.LineTool = function (data) {
             _layer.add(line);
             _layer.add(lineEnd);
             data.stage.add(_layer);
+            _layer.setZIndex(SketchPad.ViewModel.Levels.toolbarIcons);
         },
         _drawIcon = function (data) {
             var mid = data.y + data.height /2;
@@ -116,7 +125,7 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
         _spritePickerLayer.add(background);
         _spritePickerLayer.add(trash);
         _stage.add(_spritePickerLayer);
-        _spritePickerLayer.setZIndex(100);
+        _spritePickerLayer.setZIndex(SketchPad.ViewModel.Levels.toolbar);
         _spritePickerLayer.draw();
     };
 
@@ -183,21 +192,48 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
             })
         ];
 
-        var yOffset = 10;
-        for (var i = 0; i < tools.length; i++) {
-            tools[i].drawIcon({
+        var yOffset = 10,
+            iconHeight = 20,
+            iconWidth = 40,
+            _toolbarButtons = new Kinetic.Layer();
+        $.each(tools, function (i, tool) {
+            var background = new Kinetic.Rect({
+                x: 5,
+                y: yOffset,
+                height: iconHeight,
+                width: iconWidth,
+                stroke: "black",
+                strokeThickness: 1
+            });
+
+            tool.drawIcon({
                 x: 10,
                 y: yOffset,
-                width: 30,
-                height: 20
+                width: iconWidth -5,
+                height: iconHeight
             });
             yOffset += 30;
-        }
+
+            _toolbarButtons.add(background);
+
+            background.on("click", function () {
+                $.each(tools, function (j, otherTool) {
+                    if (otherTool != tool) {
+                        otherTool.detach();
+                    } else {
+                        otherTool.attach();
+                    }
+                });
+            });
+        });
 
         _toolbarLayer.add(background);
+        _stage.add(_toolbarButtons);
         _stage.add(_toolbarLayer);
-        _toolbarLayer.setZIndex(100);
+        _toolbarLayer.setZIndex(SketchPad.ViewModel.Levels.toolbar);
+        _toolbarButtons.setZIndex(SketchPad.ViewModel.Levels.toolbarButtons);
         _toolbarLayer.draw();
+        _toolbarButtons.draw();
     };
 
 	var _refreshImages = function () {
