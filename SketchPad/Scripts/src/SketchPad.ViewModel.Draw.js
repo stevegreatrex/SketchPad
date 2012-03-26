@@ -1,5 +1,45 @@
 ﻿SketchPad.ViewModel = SketchPad.ViewModel || {};
 
+SketchPad.ViewModel.LineTool = function (data) {
+    var _layer = null,
+        _color = data.color || "black",
+        _strokeWidth = data.strokeWidth || 5,
+        _attach = function () {
+        },
+        _detach = function () {
+        },
+        _drawLine = function (from, to) {
+            if (_layer) {
+                data.stage.remove(_layer);
+            }
+            _layer = new Kinetic.Layer();
+            var line = new Kinetic.Polygon({
+                points: [from, to],
+                stroke: _color,
+                strokeWidth: _strokeWidth
+            });
+            var lineEnd = new Kinetic.Circle({
+                x: to.x,
+                y: to.y,
+                radius: _strokeWidth,
+                fill: _color
+            });
+            _layer.add(line);
+            _layer.add(lineEnd);
+            data.stage.add(_layer);
+        },
+        _drawIcon = function (data) {
+            var mid = data.y + data.height /2;
+            _drawLine({ x: data.x, y: mid }, { x: data.width, y: mid });
+        };
+
+    return {
+        attach: _attach,
+        detach: _detach,
+        drawIcon: _drawIcon
+    };
+};
+
 SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
     var _backgroundImages = ko.observableArray(),
 		_isLoadingImages = ko.observable(false),
@@ -9,8 +49,11 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
 		    width: _stageContainer.width(),
 		    height: _stageContainer.height()
         }),
+        _pickerHeight = 100,
+        _toolbarWidth = 50,
         _backgroundLayer = null,
-        _spritePickerLayer = null;
+        _spritePickerLayer = null,
+        _toolbarLayer = null;
 
     var _isWithin = function (target, shape) {
         var position = shape.getPosition();
@@ -19,20 +62,30 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
         position.y > myPosition.y && position.y < myPosition.y + target.height)
     };
 
+    var _setAlphaOnHover = function (target, layer, hoverAlpha, nonHoverAlpha) {
+        target.on("mouseover.hoverAlpha", function () {
+            target.setAlpha(hoverAlpha);
+            layer.draw();
+        });
+        target.on("mouseout.hoverAlpha", function () {
+            target.setAlpha(nonHoverAlpha);
+            layer.draw();
+        });
+    };
+
     var _createSpritePickerLayer = function (spriteImages) {
         if (_spritePickerLayer) {
             _stage.remove(_spritePickerLayer);
         }
 
         _spritePickerLayer = new Kinetic.Layer();
-        var pickerHeight = 100;
-        var baseYOffset = _stage.height - (pickerHeight * 0.5);
+        var baseYOffset = _stage.height - (_pickerHeight * 0.5);
         var background = new Kinetic.Rect({
-            height: pickerHeight,
+            height: _pickerHeight,
             alpha: 0.3,
             width: _stage.width,
             fill: "white",
-            y: _stage.height - pickerHeight
+            y: _stage.height - _pickerHeight
         });
 
         var trash = new Kinetic.Rect({
@@ -64,7 +117,7 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
         _spritePickerLayer.add(trash);
         _stage.add(_spritePickerLayer);
         _spritePickerLayer.setZIndex(100);
-        _stage.add(_spritePickerLayer);
+        _spritePickerLayer.draw();
     };
 
     var _createSpriteImage = function (data) {
@@ -99,15 +152,52 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
         image.src = data.image.Data;
     };
 
-    var _setAlphaOnHover = function(target, layer, hoverAlpha, nonHoverAlpha) {
-        target.on("mouseover.hoverAlpha", function () {
-            target.setAlpha(hoverAlpha);
-            layer.draw();
+    var _createToolbarArea = function () {
+        if (_toolbarLayer) {
+            _stage.remove(_toolbarLayer);
+        }
+
+        _toolbarLayer = new Kinetic.Layer();
+        var background = new Kinetic.Rect({
+            width: _toolbarWidth,
+            alpha: 0.3,
+            height: _stage.height - _pickerHeight,
+            fill: "white"
         });
-        target.on("mouseout.hoverAlpha", function () {
-            target.setAlpha(nonHoverAlpha);
-            layer.draw();
-        });
+
+        var tools = [
+            new SketchPad.ViewModel.LineTool({
+                stage: _stage,
+                color: "red",
+                strokeWidth: 5
+            }),
+            new SketchPad.ViewModel.LineTool({
+                stage: _stage,
+                color: "green",
+                strokeWidth: 5
+            }),
+            new SketchPad.ViewModel.LineTool({
+                stage: _stage,
+                color: "orange",
+                strokeWidth: 5
+            })
+        ];
+
+        var yOffset = 10;
+        for (var i = 0; i < tools.length; i++) {
+            tools[i].drawIcon({
+                x: 10,
+                y: yOffset,
+                width: 30,
+                height: 20
+            });
+            yOffset += 30;
+        }
+
+        _toolbarLayer.add(background);
+        _stage.add(_toolbarLayer);
+        _toolbarLayer.setZIndex(100);
+        _toolbarLayer.draw();
     };
 
 	var _refreshImages = function () {
@@ -137,12 +227,12 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
 	    _backgroundLayer = new Kinetic.Layer();
 	    var image = new Image();
 	    image.onload = function () {
-	        var xRatio = image.width / _stage.width;
-	        var yRatio = image.height / _stage.height;
+	        var xRatio = image.width / (_stage.width-_toolbarWidth);
+	        var yRatio = image.height / (_stage.height-_pickerHeight);
 	        var ratio = xRatio < yRatio ? yRatio : xRatio;
 
 	        var kineticImage = new Kinetic.Image({
-	            x: 0,
+	            x: _toolbarWidth,
 	            y: 0,
 	            image: image,
 	            width: image.width / ratio,
@@ -157,6 +247,7 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
 	};
 
 	_refreshImages();
+	_createToolbarArea();
 
 	return {
 		availableBackgrounds: _backgroundImages,
