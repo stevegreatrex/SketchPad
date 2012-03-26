@@ -30,19 +30,16 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
         var baseYOffset = _stage.height - (pickerHeight * 0.5);
         var xOffset = 10;
         $.each(spriteImages, function (i, spriteImage) {
-            var image = new Image();
-            image.onload = function () {
-                var kineticImage = new Kinetic.Image({
-                    image: image,
-                    x: xOffset,
-                    y: baseYOffset - image.height / 2,
-                    alpha: 0.7
-                });
-                _setAlphaOnHover(kineticImage, _spritePickerLayer, 1, 0.7);
-                _spritePickerLayer.add(kineticImage);
-                _spritePickerLayer.draw();
-            };
-            image.src = spriteImage.Data;
+            _createSpriteImage({
+                image: spriteImage,
+                xOffset: xOffset,
+                baseYOffset: baseYOffset,
+                layer: _spritePickerLayer,
+                onCreated: function (image) {
+                    _spritePickerLayer.add(image);
+                    _spritePickerLayer.draw();
+                }
+            });
         });
         
         _spritePickerLayer.add(background);
@@ -51,12 +48,35 @@ SketchPad.ViewModel.Draw = function (imageSource, stageContainer) {
         _stage.add(_spritePickerLayer);
     };
 
+    var _createSpriteImage = function (data) {
+        var image = new Image();
+        image.onload = function () {
+            var kineticImage = new Kinetic.Image({
+                image: image,
+                x: data.xOffset,
+                y: data.baseYOffset - image.height / 2,
+                alpha: 0.7,
+                draggable: true
+            });
+            _setAlphaOnHover(kineticImage, _spritePickerLayer, 1, 0.7);
+            kineticImage.on("dragend", function () {
+                kineticImage.off("mouseover.hoverAlpha");
+                kineticImage.off("mouseout.hoverAlpha");
+            });
+            kineticImage.on("dragstart", function () {
+                onCreated(_createSpriteImage(data));
+            });
+            data.onCreated(kineticImage);
+        };
+        image.src = data.image.Data;
+    };
+
     var _setAlphaOnHover = function(target, layer, hoverAlpha, nonHoverAlpha) {
-        target.on("mouseover", function () {
+        target.on("mouseover.hoverAlpha", function () {
             target.setAlpha(hoverAlpha);
             layer.draw();
         });
-        target.on("mouseout", function () {
+        target.on("mouseout.hoverAlpha", function () {
             target.setAlpha(nonHoverAlpha);
             layer.draw();
         });
